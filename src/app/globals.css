@@ -1,0 +1,273 @@
+@import "tailwindcss";
+
+:root {
+  /* Design Colors */
+  --color-primary: #020140;
+  --color-primary-light: #040043;
+  --color-accent-green: #a2eb9a;
+  --color-accent-blue: #3c65e3;
+  --color-light-blue-1: #dee9f5;
+  --color-light-blue-2: #b8d3ee;
+  --color-light-blue-3: #f0f5fb;
+  --color-border: #e1e9f3;
+  --color-muted: #5e5d9a;
+  --color-success: #1fb60e;
+  --color-error: #af0404;
+  --color-error-alt: #af0057;
+  --color-bg-hover: #f4f8fc;
+  --color-bg-error: #f7e6e6;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 72px;
+}
+
+@layer base {
+  html, body {
+    height: 100%;
+  }
+
+  /* Clickable elements: show pointer cursor system-wide */
+  button,
+  a[href],
+  [role="button"],
+  [role="link"] {
+    cursor: pointer;
+  }
+
+  /* RTL: keep flex-col as column - do not override flex-direction */
+  [dir="rtl"] input,
+  [dir="rtl"] textarea,
+  [dir="rtl"] button {
+    text-align: right;
+  }
+}
+
+  /* Font family utilities */
+  @font-face {
+    font-family: "Migdal";
+    src: url("/Font/1_Migdal_RagSans-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Migdal";
+    src: url("/Font/1_Migdal_RagSans-Light.otf") format("opentype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Migdal";
+    src: url("/Font/1_Migdal_RagSans-ExtraLight.otf") format("opentype");
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Migdal";
+    src: url("/Font/1_Migdal_RagSans-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Migdal";
+    src: url("/Font/1_Migdal_RagSans-Black.otf") format("opentype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  .font-migdal {
+    font-family: "Migdal", "Rubik", "Assistant", "Heebo", sans-serif;
+  
+  }
+  
+
+@layer utilities {
+  /* Chat animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  /* Chat bubble - gentle slide up + fade */
+  @keyframes chatBubbleIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-chat-bubble-in {
+    animation: chatBubbleIn 0.35s ease-out forwards;
+  }
+
+  /* Thinking dots */
+  @keyframes thinkingDot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+  }
+  .animate-thinking-dot {
+    animation: thinkingDot 1.2s ease-in-out infinite;
+  }
+
+  /* Popup animations - silky and delicate */
+  @keyframes popup-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes popup-backdrop-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes popup-content-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  @keyframes popup-content-out {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.96) translateY(-8px);
+    }
+  }
+
+  /* Div פתיחה/סגירה עדינה */
+  @keyframes div-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes div-slide-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+  .animate-div-in {
+    animation: div-slide-in 0.3s ease-out forwards;
+  }
+  .animate-div-out {
+    animation: div-slide-out 0.25s ease-in forwards;
+  }
+
+  /* InfoTooltip – אנימציות פתיחה/סגירה */
+  @keyframes tooltip-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes tooltip-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+  .animate-tooltip-in {
+    animation: tooltip-in 0.2s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  }
+  .animate-tooltip-out {
+    animation: tooltip-out 0.18s ease-in forwards;
+  }
+
+  /* Confetti – אנימציה עדינה */
+  @keyframes confetti-burst-piece {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(0deg) translateY(0) scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--confetti-angle)) translateY(calc(-1 * var(--confetti-distance))) rotate(var(--confetti-spin)) scale(1);
+    }
+  }
+  .confetti-piece {
+    left: 50%;
+    top: 50%;
+    transform-origin: 50% 50%;
+    opacity: 0;
+    animation: confetti-burst-piece 0.9s ease-out forwards;
+  }
+}
+
+/* מעברי עמודים – חלק ונעים */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root) {
+    animation: page-out 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  ::view-transition-new(root) {
+    animation: page-in 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+  @keyframes page-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

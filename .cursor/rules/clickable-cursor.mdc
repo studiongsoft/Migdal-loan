@@ -1,0 +1,44 @@
+---
+description: All clickable elements must show pointer cursor
+globs: "**/*.{tsx,jsx,css}"
+alwaysApply: false
+---
+
+# Clickable Elements - Pointer Cursor
+
+כל רכיב לחיץ (כפתור, לינק, הורדה, פתיחה, בחירה וכו') חייב להציג סמן עכבר של "יד" (cursor: pointer) כדי להראות למשתמש שהרכיב ניתן ללחיצה.
+
+## Global Base (globals.css)
+
+כבר מוגדר ב-base layer:
+- `button` - כל כפתור
+- `a[href]` - כל לינק
+- `[role="button"]` - רכיבים עם role button
+- `[role="link"]` - רכיבים עם role link
+
+## רכיבים מותאמים
+
+כשיש `div`, `span` או אלמנט אחר עם `onClick`:
+- יש להוסיף `cursor-pointer` ל-className
+
+## דוגמאות
+
+```tsx
+// ✅ כפתור - מקבל אוטומטית מ-global
+<button onClick={onSave}>שמירה</button>
+
+// ✅ לינק - מקבל אוטומטית
+<a href="/page">מעבר</a>
+
+// ✅ div לחיץ - יש להוסיף cursor-pointer
+<div className="flex cursor-pointer items-center" onClick={onClose}>
+  סגירה
+</div>
+
+// ✅ Backdrop/Overlay שניתן ללחוץ לסגירה
+<div className="fixed inset-0 flex cursor-pointer items-center justify-center bg-black/60" onClick={onClose}>
+```
+
+## disabled state
+
+כפתורים ב-disabled מציגים `cursor-not-allowed` (לא pointer).
