@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Button } from "./Button";
 import { InfoTooltip } from "./InfoTooltip";
 
@@ -152,10 +151,10 @@ export function LoanOfferCard({
         )}
 
         {/* Info card - summary + product breakdown, centered, no dividers */}
-        <div className="flex flex-col items-center p-4">
-          <div className="flex w-full max-w-[480px] flex-wrap justify-center gap-4" dir="rtl">
+        <div className="flex flex-col items-center gap-4 p-4 md:gap-5">
+          <div className="flex w-full max-w-[480px] flex-wrap justify-center gap-4 md:gap-6" dir="rtl">
             {/* Summary row - RTL order: סכום הלוואה | החזר חודשי משוער | סיום ההלוואה */}
-            <div className="flex flex-1 min-w-[90px] flex-col items-center text-center">
+            <div className="flex flex-1 min-w-[90px] flex-col items-center gap-1 text-center">
               <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                 סכום הלוואה
               </p>
@@ -164,7 +163,7 @@ export function LoanOfferCard({
               </p>
             </div>
 
-            <div className="flex flex-1 min-w-[90px] flex-col items-center text-center">
+            <div className="flex flex-1 min-w-[90px] flex-col items-center gap-1 text-center">
               <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                 החזר חודשי משוער
               </p>
@@ -173,19 +172,18 @@ export function LoanOfferCard({
               </p>
             </div>
 
-            <div className="flex flex-1 min-w-[90px] flex-col items-center text-center">
-              <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
+            <div className="flex flex-1 min-w-[90px] flex-col items-center justify-start gap-1 text-center">
+              <p className="w-full text-center text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                 סיום ההלוואה
               </p>
-              <p className="text-[17px] font-normal leading-tight text-[var(--color-primary)]">
+              <p className="w-full text-center text-[17px] font-normal leading-tight text-[var(--color-primary)]">
                 {endDateStr}
               </p>
-
               {onScheduleClick && (
                 <button
                   type="button"
                   onClick={onScheduleClick}
-                  className="mt-0.5 text-[13px] font-normal text-[#3c65e3] hover:underline"
+                  className="mt-0.5 self-center text-[13px] font-normal text-[#3c65e3] hover:underline"
                 >
                   לוח סילוקין
                 </button>
@@ -195,18 +193,18 @@ export function LoanOfferCard({
 
           {/* Expanded - product breakdown (מידע נוסף) */}
           <div
-            className="grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            className="grid w-full transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
             style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
           >
             <div className="overflow-hidden">
-              <div className="mt-3 flex flex-col gap-3">
+              <div className="flex flex-col items-center gap-4 md:gap-5">
                 {offer.productBreakdown.map((row, i) => (
                   <div
                     key={i}
-                    className="flex w-full max-w-[480px] flex-wrap justify-center gap-4"
+                    className="flex w-full max-w-[480px] flex-wrap justify-center gap-4 md:gap-6"
                     dir="rtl"
                   >
-                    <div className="flex flex-1 min-w-[80px] flex-col items-center text-center">
+                    <div className="flex flex-1 min-w-[90px] flex-col items-center gap-1 text-center">
                       <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                         סוג מוצר
                       </p>
@@ -215,7 +213,7 @@ export function LoanOfferCard({
                       </p>
                     </div>
 
-                    <div className="flex flex-1 min-w-[80px] flex-col items-center text-center">
+                    <div className="flex flex-1 min-w-[90px] flex-col items-center gap-1 text-center">
                       <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                         סכום הלוואה
                       </p>
@@ -224,21 +222,20 @@ export function LoanOfferCard({
                       </p>
                     </div>
 
-                    <div className="flex flex-1 min-w-[80px] flex-col items-center text-center">
-                      <p className="text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
+                    <div className="flex flex-1 min-w-[90px] flex-col items-center gap-1 text-center">
+                      <p className="w-full text-center text-[13px] font-normal leading-tight text-[rgba(38,37,101,0.8)]">
                         סיום ההלוואה
                       </p>
-                      <div className="flex items-center justify-center gap-1.5" dir="rtl">
+                      <div className="flex w-full items-center justify-center gap-1.5" dir="rtl">
                         <p className="text-[17px] font-normal leading-tight text-[var(--color-primary)]">
                           {endDateStr}
                         </p>
-                        <Image
-                          src="/images/icons/Status.png"
-                          alt=""
-                          width={14}
-                          height={14}
-                          className="size-3.5 shrink-0 object-contain"
-                          aria-hidden
+                        <InfoTooltip
+                          title="סיום ההלוואה"
+                          body="תאריך סיום תקופת ההלוואה לכל מוצר בתמהיל."
+                          iconSrc="/images/question.svg"
+                          iconSize={14}
+                          ariaLabel="מידע על תאריך סיום ההלוואה"
                         />
                       </div>
                     </div>

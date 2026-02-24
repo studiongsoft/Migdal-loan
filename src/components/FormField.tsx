@@ -140,7 +140,13 @@ export function FormField({
           </div>
         </div>
         {type === "dropdown" && (
-          <div className="absolute left-[12px] top-[18px] size-[24px] shrink-0">
+          <button
+            type="button"
+            onClick={() => !disabled && setIsDropdownOpen((v) => !v)}
+            disabled={disabled}
+            className="absolute left-[12px] top-[18px] flex size-[24px] shrink-0 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={isDropdownOpen ? "סגור רשימה" : "פתח רשימה"}
+          >
             <img
               src="/images/chevron.svg"
               alt=""
@@ -149,7 +155,7 @@ export function FormField({
               className={`size-full transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
               aria-hidden
             />
-          </div>
+          </button>
         )}
       </div>
 
