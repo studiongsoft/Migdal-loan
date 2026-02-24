@@ -22,7 +22,7 @@ export function ConfettiBurst() {
     const angle = (i / PIECES) * 360 + (i % 2) * 8;
     const distance = BURST_RADIUS + (i % 4) * 5;
     const color = COLORS[i % COLORS.length];
-    const delay = (i % 5) * 0.04;
+    const delay = (i % 5) * 0.04; // seconds
     const size = 4 + (i % 3);
     const spin = (i % 4) * 25;
     const isRect = i % 3 !== 0;
@@ -35,16 +35,18 @@ export function ConfettiBurst() {
         <div
           key={i}
           className="confetti-piece absolute"
-          style={{
-            "--confetti-angle": `${p.angle}deg`,
-            "--confetti-distance": `${p.distance}px`,
-            "--confetti-spin": `${p.spin}deg`,
-            width: p.size,
-            height: p.isRect ? p.size * 1.5 : p.size,
-            borderRadius: p.isRect ? "2px" : "50%",
-            backgroundColor: p.color,
-            animationDelay: p.delay,
-          } as React.CSSProperties}
+          style={
+            {
+              "--confetti-angle": `${p.angle}deg`,
+              "--confetti-distance": `${p.distance}px`,
+              "--confetti-spin": `${p.spin}deg`,
+              width: p.size,
+              height: p.isRect ? p.size * 1.5 : p.size,
+              borderRadius: p.isRect ? "2px" : "50%",
+              backgroundColor: p.color,
+              animationDelay: `${p.delay}s`,
+            } as React.CSSProperties
+          }
         />
       ))}
     </div>
