@@ -1,9 +1,0 @@
-<svg width="469" height="48" viewBox="0 0 469 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="469" height="48" fill="#dee9f5"/>
-  <!-- Decorative blocks - castle turret style per Figma -->
-  <rect x="20" y="16" width="70" height="20" rx="3" fill="#b8d3ee"/>
-  <rect x="115" y="8" width="90" height="28" rx="3" fill="#b8d3ee"/>
-  <rect x="230" y="12" width="80" height="24" rx="3" fill="#b8d3ee"/>
-  <rect x="335" y="8" width="90" height="28" rx="3" fill="#b8d3ee"/>
-  <rect x="379" y="16" width="70" height="20" rx="3" fill="#b8d3ee"/>
-</svg>
