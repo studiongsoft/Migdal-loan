@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "./Button";
 
 interface LoanSimulatorOpeningScreenProps {
@@ -17,7 +18,18 @@ export function LoanSimulatorOpeningScreen({
       dir="rtl"
     >
       {/* Main Content - centered */}
-      <div className="flex w-full max-w-[948px] flex-1 flex-col items-center gap-8 pt-8 md:gap-10 md:pt-[140px]">
+      <div className="flex w-full max-w-[948px] flex-1 flex-col items-center gap-8 pt-4 md:gap-10 md:pt-8">
+        {/* כספת – מעל לקבלת הלוואה */}
+        <div className="hidden md:block scale-[0.8]">
+          <Image
+            src="/images/Safe.png"
+            alt=""
+            width={350}
+            height={300}
+            className="object-contain"
+            aria-hidden
+          />
+        </div>
         {/* Text Content */}
         <div className="flex w-full flex-col items-center gap-8 md:gap-[72px]">
           <div className="flex w-full flex-col items-center gap-6 md:gap-10">

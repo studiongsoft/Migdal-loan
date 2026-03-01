@@ -300,22 +300,10 @@ export default function LoanSimulatorPage() {
 
       {/* מסך פתיחה – לפני הלואדר */}
       {showOpeningScreen && (
-        <>
-          <LoanSimulatorOpeningScreen
-            onStart={handleStartFromOpeningScreen}
-            onBackToHome={() => router.push("/")}
-          />
-          {/* כספת בצד – כמו בכל העמודים הפנימיים */}
-          <div className="pointer-events-none absolute bottom-0 left-0 z-0 hidden md:block">
-            <Image
-              src="/images/Safe.png"
-              alt=""
-              width={350}
-              height={300}
-              className="object-contain"
-            />
-          </div>
-        </>
+        <LoanSimulatorOpeningScreen
+          onStart={handleStartFromOpeningScreen}
+          onBackToHome={() => router.push("/")}
+        />
       )}
 
       {/* תפריט מובייל */}
