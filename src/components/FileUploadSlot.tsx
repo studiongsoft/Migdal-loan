@@ -222,15 +222,15 @@ export function FileUploadSlot({
                 e.stopPropagation();
                 handleRemove();
               }}
-              className="flex size-4 shrink-0 items-center justify-center rounded p-0.5 hover:bg-[var(--color-bg-hover)]"
+              className="flex size-8 shrink-0 items-center justify-center rounded p-0.5 hover:bg-[var(--color-bg-hover)]"
               aria-label="מחק קובץ"
             >
               <Image
-                src="/images/DeleteOutlineRounded.svg"
+                src="/images/icons/mobile/delete.svg"
                 alt=""
-                width={16}
-                height={16}
-                className="size-4"
+                width={32}
+                height={32}
+                className="size-8"
               />
             </button>
           )}

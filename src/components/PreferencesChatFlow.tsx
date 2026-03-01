@@ -83,6 +83,12 @@ export function PreferencesChatFlow({
     setSelectedOption(null);
   };
 
+  const handleUserMessageEdit = (stepIndex: number) => {
+    setChatStep(stepIndex);
+    setMessages((prev) => prev.slice(0, stepIndex));
+    setSelectedOption(null);
+  };
+
   const currentStep = CHAT_STEPS[chatStep];
   const chatHistory: ChatItem[] = [];
   for (let i = 0; i < chatStep; i++) {
@@ -98,6 +104,7 @@ export function PreferencesChatFlow({
       options={currentStep?.options ?? []}
       isCalculating={isCalculating}
       onOptionSelect={handleOptionSelect}
+      onUserMessageEdit={handleUserMessageEdit}
       chatHeight="400px"
     />
   );

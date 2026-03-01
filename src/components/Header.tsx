@@ -4,11 +4,13 @@ import { MigdalLogo } from "./MigdalLogo";
 interface HeaderProps {
   onBack?: () => void;
   onNewProcess?: () => void;
+  /** לחיצה על התנתק – מוצגת אזהרה לפני יציאה */
+  onDisconnect?: () => void;
   /** במובייל – פתיחת תפריט (חזור / תהליך חדש) */
   onMenuClick?: () => void;
 }
 
-export function Header({ onBack, onNewProcess, onMenuClick }: HeaderProps = {}) {
+export function Header({ onBack, onNewProcess, onDisconnect, onMenuClick }: HeaderProps = {}) {
   return (
     <header dir="rtl" className="flex w-full flex-col bg-white">
       {/* מובייל – חץ/תפריט | לוגו | פרופיל(+תפריט כשקיים חזור) */}
@@ -118,6 +120,7 @@ export function Header({ onBack, onNewProcess, onMenuClick }: HeaderProps = {}) 
         <div className="flex flex-col items-end">
           <button
             type="button"
+            onClick={onDisconnect}
             className="flex h-[44px] w-[181px] items-center justify-center gap-3 rounded-[4px] bg-[#020140] px-4 text-[18px] hover:opacity-90"
           >
             <span className="font-bold text-[#a2eb9a]">הי טל</span>

@@ -28,6 +28,8 @@ export interface PreferencesChatProps {
   isCalculating?: boolean;
   /** בחירת אפשרות */
   onOptionSelect: (opt: ChatOption) => void;
+  /** לחיצה על עריכה בתשובת משתמש - מקבל אינדקס השלב (0, 1, 2...) */
+  onUserMessageEdit?: (stepIndex: number) => void;
   /** גובה לאזור הצ'אט (מינימלי ומקסימלי - לאזור גלילה קבוע) */
   chatHeight?: string;
 }
@@ -39,6 +41,7 @@ export function PreferencesChat({
   options = [],
   isCalculating = false,
   onOptionSelect,
+  onUserMessageEdit,
   chatHeight = "400px",
 }: PreferencesChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -68,7 +71,15 @@ export function PreferencesChat({
       >
         {displayMessages.map((m, i) => (
           <div key={i} className="animate-chat-bubble-in">
-            <ChatMessage message={m.text} type={m.type} />
+            <ChatMessage
+              message={m.text}
+              type={m.type}
+              onEdit={
+                m.type === "user" && onUserMessageEdit
+                  ? () => onUserMessageEdit(Math.floor((i - 1) / 2))
+                  : undefined
+              }
+            />
           </div>
         ))}
         {isCalculating && (

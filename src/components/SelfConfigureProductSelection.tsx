@@ -123,9 +123,9 @@ export function SelfConfigureProductSelection({
         })}
       </div>
 
-      <div className="mx-auto flex w-full max-w-[500px] flex-col items-center gap-4">
-        <div className="flex flex-wrap justify-center gap-4">
-          <SummaryValueCard label="סכום הלוואה כולל:" value={totalLoan} />
+      <div className="mx-auto flex w-full max-w-[600px] flex-col items-center gap-4">
+        <div className="flex flex-nowrap justify-center gap-[40px]" dir="rtl">
+          <SummaryValueCard label="סכום הלוואה כולל:" value={totalLoan} variant="total" />
           <SummaryValueCard label="החזר משוער כולל:" value={totalMonthly} />
         </div>
         <div className="flex flex-col items-center gap-2 overflow-hidden">

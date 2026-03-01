@@ -76,16 +76,16 @@ export function LoanOfferCard({
         {/* Header - centered, info icon always on the left of title, tooltip opens beside it */}
         <div className="relative flex flex-col items-center">
           <div className="flex items-center justify-center gap-2" dir="rtl">
-            <h3 className="text-center text-[20px] font-bold text-[var(--color-primary)]">
-              <span>{offer.titleBase} </span>
-              <span className="text-[#3c65e3]">{offer.titleAccent}</span>
+            <h3 className="text-center text-[20px] text-[var(--color-primary)]">
+              <span className="font-normal">{offer.titleBase}</span>
+              <span className="font-bold">{offer.titleAccent}</span>
             </h3>
 
             <InfoTooltip title={infoContent.title} body={infoContent.body} />
           </div>
 
           {!summaryMode && (
-            <p className="mt-1 text-center text-[14px] font-normal text-[var(--color-primary)]">
+            <p className="mt-1 text-center text-[18px] font-normal text-[var(--color-primary)]">
               יש לבחור את סוג הריבית
             </p>
           )}

@@ -1,11 +1,14 @@
 "use client";
 
+import Image from "next/image";
+
 interface ChatMessageProps {
   message: string;
   type?: "system" | "user";
+  onEdit?: () => void;
 }
 
-export function ChatMessage({ message, type = "system" }: ChatMessageProps) {
+export function ChatMessage({ message, type = "system", onEdit }: ChatMessageProps) {
   const isUser = type === "user";
 
   // מערכת מימין, משתמש משמאל
@@ -24,7 +27,7 @@ export function ChatMessage({ message, type = "system" }: ChatMessageProps) {
     <div className={`w-full flex ${align}`}>
       <div
         className={[
-          "w-fit max-w-[500px] md:max-w-[500px] max-w-[315px]",
+          "flex w-fit max-w-[500px] md:max-w-[500px] max-w-[315px] items-center gap-[10px]",
           "px-[24px] py-[16px]",
           "text-[18px] md:text-[18px] text-[16px]",
           "leading-normal whitespace-pre-wrap",
@@ -34,7 +37,17 @@ export function ChatMessage({ message, type = "system" }: ChatMessageProps) {
         ].join(" ")}
         dir="rtl"
       >
-        {message}
+        <p className="flex-1 whitespace-pre-wrap">{message}</p>
+        {isUser && (
+          <button
+            type="button"
+            onClick={() => onEdit?.()}
+            className="relative size-[24px] shrink-0 hover:opacity-80"
+            aria-label="עריכה"
+          >
+            <Image src="/images/stylus.svg" alt="" width={24} height={24} className="size-full" />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,8 @@ import { ActionButtons, Button } from "@/components/Button";
 import { ProgressBar, type ProgressStage } from "@/components/ProgressBar";
 import { SliderField } from "@/components/SliderField";
 import { Loader } from "@/components/Loader";
+import { LoanSimulatorOpeningScreen } from "@/components/LoanSimulatorOpeningScreen";
+import { ExitProcessWarningModal } from "@/components/ExitProcessWarningModal";
 
 const PROGRESS_STAGES = [
   "בירור צרכים",
@@ -134,13 +136,33 @@ export default function LoanSimulatorPage() {
     months: number;
     products?: ScheduleProduct[];
   }>({ open: false, loanAmount: 0, monthly: 0, rate: 2.8, months: 17 });
-  const [showLoader, setShowLoader] = useState(true);
+  const [showOpeningScreen, setShowOpeningScreen] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [exitWarningOpen, setExitWarningOpen] = useState(false);
+
+  const handleStartFromOpeningScreen = () => {
+    setShowOpeningScreen(false);
+    setShowLoader(true);
+  };
 
   useEffect(() => {
+    if (!showLoader) return;
     const t = setTimeout(() => setShowLoader(false), 1800);
     return () => clearTimeout(t);
-  }, []);
+  }, [showLoader]);
+
+  const isInProcess =
+    !showOpeningScreen && !showLoader && viewMode !== "completion";
+
+  useEffect(() => {
+    if (!isInProcess) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isInProcess]);
 
   const openSchedulePopup = (
     loanAmount: number,
@@ -233,7 +255,7 @@ export default function LoanSimulatorPage() {
 
   return (
     <main dir="rtl" className="relative flex min-h-screen w-full flex-col bg-white">
-      {/* Loader – מוצג בתחילה, נעלם ב-fade */}
+      {/* Loader – מוצג אחרי לחיצה על "בואו נתחיל", נעלם ב-fade */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-white transition-opacity duration-500 ease-out ${
           showLoader ? "opacity-100" : "pointer-events-none opacity-0"
@@ -246,20 +268,55 @@ export default function LoanSimulatorPage() {
 
       <div className="sticky top-0 z-20 shrink-0 bg-white">
         <Header
-          onBack={viewMode === "completion" ? undefined : canGoBack ? handleBack : undefined}
-          onNewProcess={
-            viewMode === "completion"
+          onBack={
+            showOpeningScreen
               ? undefined
-              : () => {
-                  setStep(1);
-                  setViewMode("offers");
-                }
+              : viewMode === "completion"
+                ? undefined
+                : canGoBack
+                  ? handleBack
+                  : undefined
+          }
+          onNewProcess={
+            showOpeningScreen
+              ? undefined
+              : viewMode === "completion"
+                ? undefined
+                : () => {
+                    setStep(1);
+                    setViewMode("offers");
+                  }
+          }
+          onDisconnect={
+            isInProcess ? () => setExitWarningOpen(true) : undefined
           }
           onMenuClick={
-            viewMode !== "completion" ? () => setMobileMenuOpen(true) : undefined
+            showOpeningScreen || viewMode !== "completion"
+              ? () => setMobileMenuOpen(true)
+              : undefined
           }
         />
       </div>
+
+      {/* מסך פתיחה – לפני הלואדר */}
+      {showOpeningScreen && (
+        <>
+          <LoanSimulatorOpeningScreen
+            onStart={handleStartFromOpeningScreen}
+            onBackToHome={() => router.push("/")}
+          />
+          {/* כספת בצד – כמו בכל העמודים הפנימיים */}
+          <div className="pointer-events-none absolute bottom-0 left-0 z-0 hidden md:block">
+            <Image
+              src="/images/Safe.png"
+              alt=""
+              width={350}
+              height={300}
+              className="object-contain"
+            />
+          </div>
+        </>
+      )}
 
       {/* תפריט מובייל */}
       {mobileMenuOpen && (
@@ -290,8 +347,21 @@ export default function LoanSimulatorPage() {
                 />
               </svg>
             </button>
-            {(canGoBack || viewMode !== "completion") && (
+            {(showOpeningScreen || canGoBack || viewMode !== "completion") && (
               <div className="flex flex-col gap-2">
+                {showOpeningScreen ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      router.push("/");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-[18px] font-normal text-[var(--color-primary)] hover:bg-[#f4f8fc]"
+                  >
+                    חזרה לעמוד הבית
+                  </button>
+                ) : (
+                  <>
                 {canGoBack && (
                   <button
                     type="button"
@@ -318,12 +388,15 @@ export default function LoanSimulatorPage() {
                     תהליך חדש
                   </button>
                 )}
+                  </>
+                )}
               </div>
             )}
           </div>
         </div>
       )}
 
+      {!showOpeningScreen && (
       <div className="relative z-10 mt-4 flex w-full flex-1 flex-col items-center gap-8 px-4 pb-8 md:px-16 md:pb-12">
         {/* Progress bar – מובייל בלבד, sticky, רקע מקצה לקצה (לא בשלב הטקסט המקדים) */}
         {viewMode !== "completion" && step !== 1 && (
@@ -567,22 +640,22 @@ export default function LoanSimulatorPage() {
               </div>
 
               {/* Summary */}
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-4 gap-y-6">
                 <SummaryValueCard label="החזר משוער חודשי:" value={totalMonthly} />
 
                 <ActionButtons
                   primaryLabel="להמשיך עם הצעה זו"
                   onPrimaryClick={() => setViewMode("bank-details")}
-                  secondaryLabel="הצעה נוספת לפי העדפות"
-                  onSecondaryClick={() => setViewMode("preferences-chat")}
                   primaryMinWidth="200px"
                 />
-                <Button
-                  variant="link"
-                  onClick={() => setViewMode("self-product")}
-                >
-                  אני אעשה בעצמי ←
-                </Button>
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <Button variant="link" onClick={() => setViewMode("preferences-chat")}>
+                    הצעה נוספת לפי העדפות ←
+                  </Button>
+                  <Button variant="link" onClick={() => setViewMode("self-product")}>
+                    אני אעשה בעצמי ←
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -596,9 +669,10 @@ export default function LoanSimulatorPage() {
           </p>
         )}
       </div>
+      )}
 
       {/* Progress bar - right side (RTL), fixed בדסקטופ - לא זז עם גלילה */}
-      {viewMode !== "completion" && step !== 1 && (
+      {!showOpeningScreen && viewMode !== "completion" && step !== 1 && (
         <div className="fixed right-6 top-[156px] z-20 hidden md:block">
           <ProgressBar stages={progressStages} onStepClick={handleStepClick} />
         </div>
@@ -629,9 +703,14 @@ export default function LoanSimulatorPage() {
         graceMonths={2}
         products={schedulePopup.products}
       />
+      <ExitProcessWarningModal
+        isOpen={exitWarningOpen}
+        onClose={() => setExitWarningOpen(false)}
+        onConfirm={() => router.push("/")}
+      />
 
       {/* Bottom illustration - changes by step, hidden on completion (treasur moved to OpenBankingIntro card) */}
-      {viewMode !== "completion" && viewMode !== "open-banking-intro" && (
+      {!showOpeningScreen && viewMode !== "completion" && viewMode !== "open-banking-intro" && (
         <div className="pointer-events-none absolute bottom-0 left-0 z-0 hidden md:block">
           <Image
             src={

@@ -190,8 +190,8 @@ export function SelfConfigureConditions({ products, loanMonths, onContinue, onBa
       })}
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap justify-center gap-4">
-          <SummaryValueCard label="סכום הלוואה כולל:" value={totalLoan} />
+        <div className="flex flex-nowrap justify-center gap-[40px]" dir="rtl">
+          <SummaryValueCard label="סכום הלוואה כולל:" value={totalLoan} variant="total" />
           <SummaryValueCard label="החזר משוער כולל:" value={Math.round(totalMonthly)} />
         </div>
         <div className="flex gap-4">
