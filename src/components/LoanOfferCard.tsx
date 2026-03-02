@@ -18,6 +18,52 @@ export interface LoanOfferData {
   productBreakdown: LoanOfferProductBreakdown[];
 }
 
+/** מופעים מוגדרים מראש של LoanOfferData */
+export const LOAN_OFFER_DATA_VARIANTS = {
+  liquid: {
+    titleBase: "פרטי הלוואה ",
+    titleAccent: "כספים נזילים",
+    prime: { label: "משתנה פריים- 3.3%", monthly: 2300 },
+    fixed: { label: "קבועה - 3%", monthly: 2200 },
+    loanAmount: 42200,
+    productBreakdown: [
+      { productType: "קרן השתלמות", amount: 22200 },
+      { productType: "קופת גמל להשקעה", amount: 20000 },
+    ],
+  } satisfies LoanOfferData,
+  illiquid: {
+    titleBase: "פרטי הלוואה ",
+    titleAccent: "כספים לא נזילים",
+    prime: { label: "משתנה פריים- 3.3%", monthly: 1200 },
+    fixed: { label: "קבועה 3.1%", monthly: 1100 },
+    loanAmount: 7800,
+    productBreakdown: [{ productType: "קרן השתלמות", amount: 7800 }],
+  } satisfies LoanOfferData,
+  /** גרסה עם כותרת מלאה "פרטי הלוואה כספים לא נזילים" – כספים לא נזילים ב-bold (מוצר אחד) */
+  illiquidFunds: {
+    titleBase: "פרטי הלוואה ",
+    titleAccent: "כספים לא נזילים",
+    prime: { label: "משתנה פריים- 3.3%", monthly: 1200 },
+    fixed: { label: "קבועה 3.1%", monthly: 1100 },
+    loanAmount: 7800,
+    productBreakdown: [{ productType: "קרן השתלמות", amount: 7800 }],
+  } satisfies LoanOfferData,
+  /** NotLiquidFunds2products – כספים לא נזילים עם 2 מוצרים */
+  illiquid2products: {
+    titleBase: "פרטי הלוואה ",
+    titleAccent: "כספים לא נזילים",
+    prime: { label: "משתנה פריים- 3.3%", monthly: 2300 },
+    fixed: { label: "קבועה 3.1%", monthly: 2200 },
+    loanAmount: 50000,
+    productBreakdown: [
+      { productType: "קרן השתלמות", amount: 26000 },
+      { productType: "קופת גמל להשקעה", amount: 24000 },
+    ],
+  } satisfies LoanOfferData,
+} as const satisfies Record<string, LoanOfferData>;
+
+export type LoanOfferDataVariant = keyof typeof LOAN_OFFER_DATA_VARIANTS;
+
 export interface LoanOfferInfoContent {
   title: string;
   body: string;
@@ -85,7 +131,7 @@ export function LoanOfferCard({
           </div>
 
           {!summaryMode && (
-            <p className="mt-1 text-center text-[18px] font-normal text-[var(--color-primary)]">
+            <p className="mt-1 text-center text-[14px] font-normal text-[var(--color-primary)]">
               יש לבחור את סוג הריבית
             </p>
           )}
@@ -122,10 +168,10 @@ export function LoanOfferCard({
             </label>
 
             <label
-              className={`flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[8px] px-3 py-2.5 transition-all ${
+              className={`flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[8px] border px-3 py-2.5 transition-colors ${
                 selectedRate === "prime"
-                  ? "border-2 border-[var(--color-primary)] shadow-[0px_0px_11px_0px_rgba(0,0,0,0.15)]"
-                  : "border border-[#E1E9F3] bg-white shadow-[0px_0px_11px_0px_rgba(0,0,0,0.08)]"
+                  ? "border-[var(--color-primary)] bg-[#f4f8fc]"
+                  : "border-[#E1E9F3] bg-white"
               }`}
             >
               <div className="flex w-full items-center gap-1.5">

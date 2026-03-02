@@ -21,7 +21,7 @@ const Row = ({
   <div className="w-[720px] rounded-[16px] border border-[rgba(0,0,0,0.08)] bg-white p-6">
     <div className="mb-2 text-sm opacity-60">{label}</div>
     <div className={`${className} text-[32px] leading-[1.2]`} style={{ fontWeight: weight }}>
-      מגדל קשת, בדיקת פונט 123456
+      מגדל פדיון קשת, בדיקת פונט 123456
     </div>
     <div className="mt-3 text-sm opacity-60">
       font-weight: {weight}

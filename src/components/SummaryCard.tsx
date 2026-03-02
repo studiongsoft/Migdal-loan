@@ -27,7 +27,7 @@ export function SummaryCard() {
           <p className="text-right text-[24px] text-[#3c65e3]">
             <span className="leading-none">עד היום </span>
             <span className="leading-none underline decoration-solid">חסכת</span>
-            <span className="leading-none"> בקופות קשת שלך</span>
+            <span className="leading-none"> בקופות פדיון קשת שלך</span>
           </p>
 
           {/* Main amount */}

@@ -24,7 +24,7 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
 export const System: Story = {
   args: {
     type: "system",
-    message: "שלום ישראל!\nאני כאן כדי לעזור לך להמשיך כספים מקופת קשת שלך.",
+    message: "שלום ישראל!\nאני כאן כדי לעזור לך להמשיך כספים מקופת פדיון קשת שלך.",
   },
   render: (args) => (
     <Frame>

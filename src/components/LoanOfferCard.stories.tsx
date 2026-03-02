@@ -2,30 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import {
   LoanOfferCard,
-  type LoanOfferData,
+  LOAN_OFFER_DATA_VARIANTS,
   type LoanOfferInfoContent,
 } from "./LoanOfferCard";
-
-const OFFER_LIQUID: LoanOfferData = {
-  titleBase: "פרטי הלוואה ",
-  titleAccent: "כספים נזילים",
-  prime: { label: "משתנה פריים- 3.3%", monthly: 2300 },
-  fixed: { label: "קבועה - 3%", monthly: 2200 },
-  loanAmount: 42200,
-  productBreakdown: [
-    { productType: "קרן השתלמות", amount: 22200 },
-    { productType: "קופת גמל להשקעה", amount: 20000 },
-  ],
-};
-
-const OFFER_ILLIQUID: LoanOfferData = {
-  titleBase: "פרטי הלוואה ",
-  titleAccent: "כספים לא נזילים",
-  prime: { label: "משתנה פריים- 3.3%", monthly: 1200 },
-  fixed: { label: "קבועה 3.1%", monthly: 1100 },
-  loanAmount: 7800,
-  productBreakdown: [{ productType: "קרן השתלמות", amount: 7800 }],
-};
 
 const INFO_LIQUID: LoanOfferInfoContent = {
   title: "כספים נזילים",
@@ -50,13 +29,13 @@ export default meta;
 
 type Story = StoryObj<typeof LoanOfferCard>;
 
-export const LiquidFunds: Story = {
+export const LiquidFunds2products: Story = {
   render: () => {
     const [rate, setRate] = useState<"prime" | "fixed">("fixed");
     const [expanded, setExpanded] = useState(false);
     return (
       <LoanOfferCard
-        offer={OFFER_LIQUID}
+        offer={LOAN_OFFER_DATA_VARIANTS.liquid}
         selectedRate={rate}
         onRateChange={setRate}
         isExpanded={expanded}
@@ -69,13 +48,13 @@ export const LiquidFunds: Story = {
   },
 };
 
-export const IlliquidFunds: Story = {
+export const NotLiquidFunds2products: Story = {
   render: () => {
-    const [rate, setRate] = useState<"prime" | "fixed">("prime");
+    const [rate, setRate] = useState<"prime" | "fixed">("fixed");
     const [expanded, setExpanded] = useState(false);
     return (
       <LoanOfferCard
-        offer={OFFER_ILLIQUID}
+        offer={LOAN_OFFER_DATA_VARIANTS.illiquid2products}
         selectedRate={rate}
         onRateChange={setRate}
         isExpanded={expanded}
@@ -87,3 +66,48 @@ export const IlliquidFunds: Story = {
     );
   },
 };
+
+export const IlliquidFunds_oneproduct: Story = {
+  render: () => {
+    const [rate, setRate] = useState<"prime" | "fixed">("prime");
+    const [expanded, setExpanded] = useState(false);
+    const offerWithLiquidTitle = {
+      ...LOAN_OFFER_DATA_VARIANTS.illiquid,
+      titleBase: "פרטי הלוואה ",
+      titleAccent: "כספים נזילים",
+    };
+    return (
+      <LoanOfferCard
+        offer={offerWithLiquidTitle}
+        selectedRate={rate}
+        onRateChange={setRate}
+        isExpanded={expanded}
+        onToggleExpand={() => setExpanded(!expanded)}
+        onScheduleClick={() => alert("לוח סילוקין")}
+        infoContent={INFO_ILLIQUID}
+        loanMonths={84}
+      />
+    );
+  },
+};
+
+/** כותרת: פרטי הלוואה כספים לא נזילים */
+export const notliquid_oneproduct: Story = {
+  render: () => {
+    const [rate, setRate] = useState<"prime" | "fixed">("prime");
+    const [expanded, setExpanded] = useState(false);
+    return (
+      <LoanOfferCard
+        offer={LOAN_OFFER_DATA_VARIANTS.illiquidFunds}
+        selectedRate={rate}
+        onRateChange={setRate}
+        isExpanded={expanded}
+        onToggleExpand={() => setExpanded(!expanded)}
+        onScheduleClick={() => alert("לוח סילוקין")}
+        infoContent={INFO_ILLIQUID}
+        loanMonths={84}
+      />
+    );
+  },
+};
+

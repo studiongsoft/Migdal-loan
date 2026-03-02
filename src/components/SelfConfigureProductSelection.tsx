@@ -27,12 +27,14 @@ interface SelfConfigureProductSelectionProps {
   loanMonths: number;
   onMonthsChange: (m: number) => void;
   onContinue: (selectedIds: string[], conditions: ProductConditions[]) => void;
+  products?: ProductItem[];
 }
 
 export function SelfConfigureProductSelection({
   loanMonths,
   onMonthsChange,
   onContinue,
+  products = MOCK_PRODUCTS,
 }: SelfConfigureProductSelectionProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [conditions, setConditions] = useState<Record<string, ProductCondition>>({});
@@ -103,7 +105,7 @@ export function SelfConfigureProductSelection({
       </div>
 
       <div className="flex w-full flex-col items-center gap-4">
-        {MOCK_PRODUCTS.map((p) => {
+        {products.map((p) => {
           const cond = getOrCreateCondition(p);
           const monthly = selectedIds.has(p.id)
             ? estimateMonthly(cond.loanAmount, cond.interestType === "fixed" ? 3.1 : 3.3)

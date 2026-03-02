@@ -7,7 +7,10 @@ import { InfoTooltip } from "./InfoTooltip";
 export interface Fund {
   id: string;
   name: string;
+  /** סכום צבירה להצגה (למשל "180,000") - אופציונלי, אם לא קיים משתמשים ב-name */
+  amount?: string;
   hasInfo?: boolean;
+  hasExistingLoan?: boolean;
   tooltipTitle?: string;
   tooltipBody?: string;
 }
@@ -15,23 +18,32 @@ export interface Fund {
 export interface FundSelectionCardProps {
   funds: Fund[];
   onConfirm: (selectedFundId: string) => void;
+  /** כאשר יש הלוואות על קופות – טקסט מקדים לפי Figma */
+  hasExistingLoans?: boolean;
 }
 
-export function FundSelectionCard({ funds, onConfirm }: FundSelectionCardProps) {
+const INTRO_NO_LOANS = `בכל בקשה ניתן למשוך כספים מקופה אחת בלבד.
+אל תדאג, בסוף התהליך הדיגיטלי נאפשר לך לבחור
+קופה נוספת למשיכה`;
+
+const INTRO_WITH_LOANS = `הנה רשימת הקופות שיש לך והצבירה בכל אחת.
+מאיזה קופה אתה רוצה למשוך את הכסף?`;
+
+export function FundSelectionCard({ funds, onConfirm, hasExistingLoans }: FundSelectionCardProps) {
   const [selectedFund, setSelectedFund] = useState<string | null>(null);
 
   const handleConfirm = () => {
     if (selectedFund) onConfirm(selectedFund);
   };
 
+  const introText = hasExistingLoans ? INTRO_WITH_LOANS : INTRO_NO_LOANS;
+
   return (
     <div className="w-full flex justify-start">
       <div className="w-fit max-w-[500px] md:max-w-[500px] max-w-[315px] rounded-tr-[0px] rounded-tl-[27px] rounded-br-[27px] rounded-bl-[27px] px-[24px] py-[16px] bg-[#EAF1FA]">
         <div className="flex flex-col gap-[8px] items-end">
           <p className="text-right text-[18px] md:text-[18px] text-[16px] leading-normal text-[#262565] whitespace-pre-wrap">
-            {`בכל בקשה ניתן למשוך כספים מקופה אחת בלבד.
-אל תדאג, בסוף התהליך הדיגיטלי נאפשר לך לבחור
-קופה נוספת למשיכה`}
+            {introText}
           </p>
 
           <p className="w-full text-right text-[18px] md:text-[18px] text-[16px] font-bold leading-normal text-[#3c65e3]">
@@ -67,10 +79,19 @@ export function FundSelectionCard({ funds, onConfirm }: FundSelectionCardProps) 
                   </div>
                 </div>
 
-                {/* Text */}
-                <span className="text-[18px] md:text-[18px] text-[16px] leading-normal text-[#262565] text-right flex-1">
-                  {fund.name}
-                </span>
+                {/* Text + Badge */}
+                <div className="flex flex-1 items-center justify-end gap-[8px] flex-wrap">
+                  <span className="text-[18px] md:text-[18px] text-[16px] leading-normal text-[#262565] text-right">
+                    {fund.amount != null
+                      ? `קופה ${fund.id} – סה״כ צבירה ${fund.amount}₪`
+                      : fund.name}
+                  </span>
+                  {fund.hasExistingLoan && (
+                    <span className="rounded-[4px] bg-[#020140] px-2 py-0.5 text-[12px] font-normal text-white shrink-0">
+                      קיימת הלוואה
+                    </span>
+                  )}
+                </div>
 
                 {/* Info icon */}
                 {fund.hasInfo ? (
@@ -90,7 +111,7 @@ export function FundSelectionCard({ funds, onConfirm }: FundSelectionCardProps) 
             variant="primary"
             onClick={handleConfirm}
             disabled={!selectedFund}
-            className="w-full"
+            className="w-full md:w-full self-stretch"
           >
             אישור
           </Button>

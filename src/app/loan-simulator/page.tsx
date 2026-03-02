@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 import Image from "next/image";
 import { Header } from "@/components/Header";
@@ -19,7 +20,7 @@ import { OpenFinanceConnectModal } from "@/components/OpenFinanceConnectModal";
 import { DocumentsAndSignatures } from "@/components/DocumentsAndSignatures";
 import { TermsOfUsePopup } from "@/components/TermsOfUsePopup";
 import { CompletionScreen } from "@/components/CompletionScreen";
-import { LoanOfferCard } from "@/components/LoanOfferCard";
+import { LoanOfferCard, LOAN_OFFER_DATA_VARIANTS } from "@/components/LoanOfferCard";
 import { SummaryValueCard } from "@/components/SummaryValueCard";
 import { ActionButtons, Button } from "@/components/Button";
 import { ProgressBar, type ProgressStage } from "@/components/ProgressBar";
@@ -27,6 +28,8 @@ import { SliderField } from "@/components/SliderField";
 import { Loader } from "@/components/Loader";
 import { LoanSimulatorOpeningScreen } from "@/components/LoanSimulatorOpeningScreen";
 import { ExitProcessWarningModal } from "@/components/ExitProcessWarningModal";
+import { StopStateScreen } from "@/components/StopStateScreen";
+import { SystemErrorModal } from "@/components/SystemErrorModal";
 
 const PROGRESS_STAGES = [
   "בירור צרכים",
@@ -45,47 +48,6 @@ const DECLARATIONS_CONTENT = [
   'מבלי לגרוע מכלליות האמור לעיל, הלווה מאשר שידוע לו שהחברה אוגרת ועושה שימוש במידע המתקבל אצלה או אצל תאגידים אחרים בקבוצת מגדל בקשר עם הלווה מצווים שיפוטיים ורשויות מוסמכות ובכלל זה מכוח הוראות חוק ההוצאה לפועל, פקודת המיסים (גביה), תקנות סדר הדין אזרחי וחוק נתוני אשראי (להלן - "המידע השיפוטי") ומכל מקור מידע חוקי אחר. מידע השיפוטי נשמר, ככל שהדבר מותר על פי הדין, לצורך ניהול סיכונים, לרבות החלטות בעניין מתן שירותים שונים, ולתקופה לפי שיקול דעת החברה וכן למטרות אחרות, ככל שהדבר מותר על פי הדין או לפי הסכמת הלווה. נמסר ללווה כי המידע השיפוטי חיוני לחברה לצורך ניהול וניטור סיכוניה, וכי חוסר במידע כאמור עלול שלא לאפשר לחברה להעריך את סיכוניה בקשר להלוואה ופירעונה, ולכן במקרה בו הלווה יבטל הסכמתו כאמור לעיל, תהיה החברה רשאית להעמיד את ההלוואה לפירעון מיידי.',
   'הלווה יהיה רשאי לבקש בכל עת מהחברה ובאמצעותה להסיר אותו מרשימת הדיוור האמורה, ולהגביל את השימוש במידע לנדרש לצורך ניהול ההלוואה.',
 ];
-
-const OFFER_LIQUID = {
-  title: "פרטי הלוואה כספים נזילים",
-  titleBase: "פרטי הלוואה ",
-  titleAccent: "כספים נזילים",
-  prime: { label: "משתנה פריים- 3.3%", monthly: 2300 },
-  fixed: { label: "קבועה - 3%", monthly: 2200 },
-  loanAmount: 42200,
-  products: "קרן השתלמות, קופת גמל להשקעה, לוח סילוקין",
-  expandedDetails: [
-    { label: "החזר חודשי משוער", value: "₪2,200" },
-    { label: "מוצרים", value: "קרן השתלמות, קופת גמל להשקעה" },
-    { label: "סוג הלוואה", value: "שפיצר" },
-    { label: "סכום הלוואה", value: "₪42,200" },
-    { label: "סוג מוצר", value: "גמל" },
-    { label: "קרן השתלמות", value: "₪22,200" },
-    { label: "קופת גמל להשקעה", value: "₪20,000" },
-  ],
-  productBreakdown: [
-    { productType: "קרן השתלמות", amount: 22200 },
-    { productType: "קופת גמל להשקעה", amount: 20000 },
-  ],
-};
-
-const OFFER_ILLIQUID = {
-  title: "פרטי הלוואה כספים לא נזילים",
-  titleBase: "פרטי הלוואה ",
-  titleAccent: "כספים לא נזילים",
-  prime: { label: "משתנה פריים- 3.3%", monthly: 1200 },
-  fixed: { label: "קבועה 3.1%", monthly: 1100 },
-  loanAmount: 7800,
-  products: "קרן השתלמות, לוח סילוקין",
-  expandedDetails: [
-    { label: "החזר חודשי משוער", value: "₪1,200" },
-    { label: "מוצרים", value: "קרן השתלמות" },
-    { label: "סוג הלוואה", value: "שפיצר" },
-    { label: "סכום הלוואה", value: "₪7,800" },
-    { label: "סוג מוצר", value: "גמל" },
-  ],
-  productBreakdown: [{ productType: "קרן השתלמות", amount: 7800 }],
-};
 
 const INFO_LIQUID = {
   title: "כספים נזילים",
@@ -107,14 +69,27 @@ type ViewMode =
   | "documents"
   | "completion";
 
-const MOCK_PRODUCTS: ProductItem[] = [
+/** תרחיש מספר חשבונות: LiquidFunds2products + NotLiquidFunds2products */
+const MOCK_MULTI_PRODUCTS: ProductItem[] = [
   { id: "1", name: "קרן השתלמות", fundId: "2143245453", fundStatus: "liquid", maxWithdrawal: 70000 },
   { id: "2", name: "קופת גמל להשקעה", fundId: "654655764", fundStatus: "liquid", maxWithdrawal: 210000 },
   { id: "3", name: "קרן השתלמות", fundId: "2978756434", fundStatus: "illiquid", maxWithdrawal: 140000 },
+  { id: "4", name: "קופת גמל להשקעה", fundId: "3124567890", fundStatus: "illiquid", maxWithdrawal: 95000 },
 ];
 
-export default function LoanSimulatorPage() {
+/** תרחיש חשבון אחד: IlliquidFunds_oneproduct / notliquid_oneproduct */
+const MOCK_SINGLE_PRODUCTS: ProductItem[] = [
+  { id: "1", name: "קרן השתלמות", fundId: "2978756434", fundStatus: "illiquid", maxWithdrawal: 140000 },
+];
+
+export type LoanSimulatorScenario = "no-accounts" | "system-error" | "single-account" | "multi-accounts";
+
+function LoanSimulatorContent() {
+  const searchParams = useSearchParams();
+  const scenario = (searchParams.get("scenario") as LoanSimulatorScenario) || "multi-accounts";
   const router = useTransitionRouter();
+  const displayProducts =
+    scenario === "multi-accounts" ? MOCK_MULTI_PRODUCTS : MOCK_SINGLE_PRODUCTS;
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loanAmount, setLoanAmount] = useState(50000);
   const [loanMonths, setLoanMonths] = useState(14);
@@ -152,6 +127,9 @@ export default function LoanSimulatorPage() {
     return () => clearTimeout(t);
   }, [showLoader]);
 
+  const showNoAccountsError = !showOpeningScreen && !showLoader && scenario === "no-accounts";
+  const showSystemErrorModal = !showOpeningScreen && !showLoader && scenario === "system-error";
+
   const isInProcess =
     !showOpeningScreen && !showLoader && viewMode !== "completion";
 
@@ -185,8 +163,12 @@ export default function LoanSimulatorPage() {
       : loanAmount;
 
   const totalMonthly =
-    (liquidRate === "prime" ? OFFER_LIQUID.prime.monthly : OFFER_LIQUID.fixed.monthly) +
-    (illiquidRate === "prime" ? OFFER_ILLIQUID.prime.monthly : OFFER_ILLIQUID.fixed.monthly);
+    scenario === "multi-accounts"
+      ? (liquidRate === "prime" ? LOAN_OFFER_DATA_VARIANTS.liquid.prime.monthly : LOAN_OFFER_DATA_VARIANTS.liquid.fixed.monthly) +
+        (illiquidRate === "prime" ? LOAN_OFFER_DATA_VARIANTS.illiquid2products.prime.monthly : LOAN_OFFER_DATA_VARIANTS.illiquid2products.fixed.monthly)
+      : illiquidRate === "prime"
+        ? LOAN_OFFER_DATA_VARIANTS.illiquidFunds.prime.monthly
+        : LOAN_OFFER_DATA_VARIANTS.illiquidFunds.fixed.monthly;
 
   function computeSelfFlowMonthly(): number {
     if (selfConditions.length === 0) return totalMonthly;
@@ -207,7 +189,8 @@ export default function LoanSimulatorPage() {
       setViewMode(selfConditions.length > 0 ? "offer-details" : "offers");
     else if (viewMode === "offer-details")
       setViewMode(selfConditions.length > 0 ? "self-product" : "offers");
-    else if (viewMode === "self-product" || viewMode === "preferences-chat") setViewMode("offers");
+    else if (viewMode === "self-product") setViewMode("offers");
+    else if (viewMode === "preferences-chat") setViewMode("offers");
     else if (step === 3 && viewMode === "offers") setStep(2);
     else if (step === 2) setStep(1);
   };
@@ -306,6 +289,29 @@ export default function LoanSimulatorPage() {
         />
       )}
 
+      {/* תרחיש: אין חשבונות – הודעת שגיאה לאחר הלואדר */}
+      {showNoAccountsError && (
+        <div className="relative z-10 mt-8 flex flex-1 flex-col items-center justify-center px-4 pb-8">
+          <StopStateScreen
+            title="לצערנו לא ניתן להמשיך"
+            subtitle="לא נמצאו הלוואות"
+            primaryButton={{
+              label: "חזרה לעמוד הבית",
+              onClick: () => router.push("/"),
+            }}
+          />
+        </div>
+      )}
+
+      {/* תרחיש: תקלת מערכת – מודל לאחר הלואדר */}
+      {showSystemErrorModal && (
+        <SystemErrorModal
+          isOpen={showSystemErrorModal}
+          onClose={() => router.push("/")}
+          onContinue={() => router.push("/")}
+        />
+      )}
+
       {/* תפריט מובייל */}
       {mobileMenuOpen && (
         <div
@@ -384,7 +390,7 @@ export default function LoanSimulatorPage() {
         </div>
       )}
 
-      {!showOpeningScreen && (
+      {!showOpeningScreen && !showNoAccountsError && !showSystemErrorModal && (
       <div className="relative z-10 mt-4 flex w-full flex-1 flex-col items-center gap-8 px-4 pb-8 md:px-16 md:pb-12">
         {/* Progress bar – מובייל בלבד, sticky, רקע מקצה לקצה (לא בשלב הטקסט המקדים) */}
         {viewMode !== "completion" && step !== 1 && (
@@ -488,6 +494,7 @@ export default function LoanSimulatorPage() {
               <SelfConfigureProductSelection
                 loanMonths={loanMonths}
                 onMonthsChange={setLoanMonths}
+                products={displayProducts}
                 onContinue={(ids, conds) => {
                   setSelectedProductIds(ids);
                   setSelfConditions(conds);
@@ -499,7 +506,7 @@ export default function LoanSimulatorPage() {
             /* Offer details - before bank */
             <div className="flex flex-col gap-8">
               <OfferDetailsSummary
-                products={MOCK_PRODUCTS.filter((p) => selectedProductIds.includes(p.id))}
+                products={displayProducts.filter((p) => selectedProductIds.includes(p.id))}
                 conditions={selfConditions}
                 loanMonths={loanMonths}
                 onContinueToBank={() => setViewMode("bank-details")}
@@ -571,60 +578,94 @@ export default function LoanSimulatorPage() {
             /* Step 3 - Loan offers (default) */
             <div className="flex flex-col items-center gap-8">
               <div className="flex w-full max-w-[606px] flex-col items-center gap-6">
-                <LoanOfferCard
-                  offer={OFFER_LIQUID}
-                  selectedRate={liquidRate}
-                  onRateChange={setLiquidRate}
-                  isExpanded={liquidExpanded}
-                  onToggleExpand={() => setLiquidExpanded(!liquidExpanded)}
-                  infoContent={INFO_LIQUID}
-                  loanMonths={loanMonths}
-                  onScheduleClick={() => {
-                    const products: ScheduleProduct[] = OFFER_LIQUID.productBreakdown.map((p, i) => ({
-                      id: `liquid-${i}`,
-                      name: p.productType,
-                      loanAmount: p.amount,
-                      annualRatePercent: liquidRate === "prime" ? 3.3 : 3,
-                      months: loanMonths,
-                      graceMonths: 2,
-                      loanType: "שפיצר",
-                    }));
-                    openSchedulePopup(
-                      OFFER_LIQUID.loanAmount,
-                      liquidRate === "prime" ? OFFER_LIQUID.prime.monthly : OFFER_LIQUID.fixed.monthly,
-                      liquidRate === "prime" ? 3.3 : 3,
-                      loanMonths,
-                      products
-                    );
-                  }}
-                />
-                <LoanOfferCard
-                  offer={OFFER_ILLIQUID}
-                  selectedRate={illiquidRate}
-                  onRateChange={setIlliquidRate}
-                  isExpanded={illiquidExpanded}
-                  onToggleExpand={() => setIlliquidExpanded(!illiquidExpanded)}
-                  infoContent={INFO_ILLIQUID}
-                  loanMonths={loanMonths}
-                  onScheduleClick={() => {
-                    const products: ScheduleProduct[] = OFFER_ILLIQUID.productBreakdown.map((p, i) => ({
-                      id: `illiquid-${i}`,
-                      name: p.productType,
-                      loanAmount: p.amount,
-                      annualRatePercent: illiquidRate === "prime" ? 3.3 : 3.1,
-                      months: loanMonths,
-                      graceMonths: 2,
-                      loanType: "שפיצר",
-                    }));
-                    openSchedulePopup(
-                      OFFER_ILLIQUID.loanAmount,
-                      illiquidRate === "prime" ? OFFER_ILLIQUID.prime.monthly : OFFER_ILLIQUID.fixed.monthly,
-                      illiquidRate === "prime" ? 3.3 : 3.1,
-                      loanMonths,
-                      products
-                    );
-                  }}
-                />
+                {scenario === "multi-accounts" ? (
+                  /* מספר חשבונות: LiquidFunds2products + NotLiquidFunds2products */
+                  <>
+                    <LoanOfferCard
+                      offer={LOAN_OFFER_DATA_VARIANTS.liquid}
+                      selectedRate={liquidRate}
+                      onRateChange={setLiquidRate}
+                      isExpanded={liquidExpanded}
+                      onToggleExpand={() => setLiquidExpanded(!liquidExpanded)}
+                      infoContent={INFO_LIQUID}
+                      loanMonths={loanMonths}
+                      onScheduleClick={() => {
+                        const products: ScheduleProduct[] = LOAN_OFFER_DATA_VARIANTS.liquid.productBreakdown.map((p, i) => ({
+                          id: `liquid-${i}`,
+                          name: p.productType,
+                          loanAmount: p.amount,
+                          annualRatePercent: liquidRate === "prime" ? 3.3 : 3,
+                          months: loanMonths,
+                          graceMonths: 2,
+                          loanType: "שפיצר",
+                        }));
+                        openSchedulePopup(
+                          LOAN_OFFER_DATA_VARIANTS.liquid.loanAmount,
+                          liquidRate === "prime" ? LOAN_OFFER_DATA_VARIANTS.liquid.prime.monthly : LOAN_OFFER_DATA_VARIANTS.liquid.fixed.monthly,
+                          liquidRate === "prime" ? 3.3 : 3,
+                          loanMonths,
+                          products
+                        );
+                      }}
+                    />
+                    <LoanOfferCard
+                      offer={LOAN_OFFER_DATA_VARIANTS.illiquid2products}
+                      selectedRate={illiquidRate}
+                      onRateChange={setIlliquidRate}
+                      isExpanded={illiquidExpanded}
+                      onToggleExpand={() => setIlliquidExpanded(!illiquidExpanded)}
+                      infoContent={INFO_ILLIQUID}
+                      loanMonths={loanMonths}
+                      onScheduleClick={() => {
+                        const products: ScheduleProduct[] = LOAN_OFFER_DATA_VARIANTS.illiquid2products.productBreakdown.map((p, i) => ({
+                          id: `illiquid-${i}`,
+                          name: p.productType,
+                          loanAmount: p.amount,
+                          annualRatePercent: illiquidRate === "prime" ? 3.3 : 3.1,
+                          months: loanMonths,
+                          graceMonths: 2,
+                          loanType: "שפיצר",
+                        }));
+                        openSchedulePopup(
+                          LOAN_OFFER_DATA_VARIANTS.illiquid2products.loanAmount,
+                          illiquidRate === "prime" ? LOAN_OFFER_DATA_VARIANTS.illiquid2products.prime.monthly : LOAN_OFFER_DATA_VARIANTS.illiquid2products.fixed.monthly,
+                          illiquidRate === "prime" ? 3.3 : 3.1,
+                          loanMonths,
+                          products
+                        );
+                      }}
+                    />
+                  </>
+                ) : (
+                  /* חשבון אחד: illiquidFunds_oneproduct / notliquid_oneproduct */
+                  <LoanOfferCard
+                    offer={LOAN_OFFER_DATA_VARIANTS.illiquidFunds}
+                    selectedRate={illiquidRate}
+                    onRateChange={setIlliquidRate}
+                    isExpanded={illiquidExpanded}
+                    onToggleExpand={() => setIlliquidExpanded(!illiquidExpanded)}
+                    infoContent={INFO_ILLIQUID}
+                    loanMonths={loanMonths}
+                    onScheduleClick={() => {
+                      const products: ScheduleProduct[] = LOAN_OFFER_DATA_VARIANTS.illiquidFunds.productBreakdown.map((p, i) => ({
+                        id: `single-${i}`,
+                        name: p.productType,
+                        loanAmount: p.amount,
+                        annualRatePercent: illiquidRate === "prime" ? 3.3 : 3.1,
+                        months: loanMonths,
+                        graceMonths: 2,
+                        loanType: "שפיצר",
+                      }));
+                      openSchedulePopup(
+                        LOAN_OFFER_DATA_VARIANTS.illiquidFunds.loanAmount,
+                        illiquidRate === "prime" ? LOAN_OFFER_DATA_VARIANTS.illiquidFunds.prime.monthly : LOAN_OFFER_DATA_VARIANTS.illiquidFunds.fixed.monthly,
+                        illiquidRate === "prime" ? 3.3 : 3.1,
+                        loanMonths,
+                        products
+                      );
+                    }}
+                  />
+                )}
               </div>
 
               {/* Summary */}
@@ -660,7 +701,7 @@ export default function LoanSimulatorPage() {
       )}
 
       {/* Progress bar - right side (RTL), fixed בדסקטופ - לא זז עם גלילה */}
-      {!showOpeningScreen && viewMode !== "completion" && step !== 1 && (
+      {!showOpeningScreen && !showNoAccountsError && !showSystemErrorModal && viewMode !== "completion" && step !== 1 && (
         <div className="fixed right-6 top-[156px] z-20 hidden md:block">
           <ProgressBar stages={progressStages} onStepClick={handleStepClick} />
         </div>
@@ -698,7 +739,7 @@ export default function LoanSimulatorPage() {
       />
 
       {/* Bottom illustration - changes by step, hidden on completion (treasur moved to OpenBankingIntro card) */}
-      {!showOpeningScreen && viewMode !== "completion" && viewMode !== "open-banking-intro" && (
+      {!showOpeningScreen && !showNoAccountsError && !showSystemErrorModal && viewMode !== "completion" && viewMode !== "open-banking-intro" && (
         <div className="pointer-events-none absolute bottom-0 left-0 z-0 hidden md:block">
           <Image
             src={
@@ -718,5 +759,13 @@ export default function LoanSimulatorPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function LoanSimulatorPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoanSimulatorContent />
+    </Suspense>
   );
 }
