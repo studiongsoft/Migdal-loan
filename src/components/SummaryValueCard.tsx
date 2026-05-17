@@ -34,14 +34,18 @@ export function SummaryValueCard({
   const formatted = new Intl.NumberFormat("he-IL").format(value);
   return (
     <div
-      className={`relative flex h-[102px] shrink-0 flex-col items-center justify-center overflow-visible rounded-[8px] border border-[#d4e5f5] bg-[#e3eef8] px-5 py-6 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.12)] md:px-8 md:py-6 ${className}`}
+      className={`relative flex min-h-[78px] min-w-0 flex-col items-center justify-center overflow-visible rounded-[8px] border border-[#d4e5f5] bg-[#e3eef8] px-2 py-3 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.12)] max-md:max-w-full md:h-[102px] md:px-8 md:py-6 ${className}`}
       dir="rtl"
     >
-      <div className="flex h-[54px] flex-col items-center justify-center gap-2 ps-5">
-        <p className="flex h-[32px] items-center justify-center text-center text-[24px] font-normal leading-normal text-[#3c65e3]">{label}</p>
-        <div className="flex h-[14px] items-center justify-center gap-0.5">
-          <span className="text-[15px] font-bold text-[var(--color-primary)]">₪</span>
-          <span className="text-[24px] font-bold leading-normal text-[var(--color-primary)]">{formatted}</span>
+      <div className="flex min-h-[48px] w-full flex-col items-center justify-center gap-1 ps-2 pe-1 md:h-[54px] md:gap-2 md:ps-5">
+        <p className="flex min-h-[2.25rem] w-full items-center justify-center text-center text-[11px] font-normal leading-[1.15] text-[#3c65e3] md:h-[32px] md:min-h-0 md:text-[24px] md:leading-normal">
+          {label}
+        </p>
+        <div className="flex h-auto min-h-[14px] items-center justify-center gap-0.5">
+          <span className="text-[12px] font-bold text-[var(--color-primary)] md:text-[15px]">₪</span>
+          <span className="text-[17px] font-bold leading-none text-[var(--color-primary)] md:text-[24px] md:leading-normal">
+            {formatted}
+          </span>
         </div>
       </div>
       <Image
@@ -49,7 +53,9 @@ export function SummaryValueCard({
         alt=""
         width={VARIANT_IMAGE_SIZE[variant].width}
         height={VARIANT_IMAGE_SIZE[variant].height}
-        className="absolute -right-4 top-[44px] object-contain"
+        className={`absolute object-contain max-md:-right-1 max-md:top-[38px] max-md:h-[46px] max-md:w-auto md:-right-4 md:top-[44px] ${
+          variant === "monthly" ? "max-md:max-w-[28px]" : "max-md:max-w-[52px]"
+        }`}
         aria-hidden
       />
     </div>

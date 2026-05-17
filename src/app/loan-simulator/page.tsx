@@ -490,7 +490,7 @@ function LoanSimulatorContent() {
             </div>
           ) : viewMode === "self-product" ? (
             /* Self configure - unified: product selection + inline conditions */
-            <div className="flex flex-col items-center gap-8">
+            <div className="flex w-full min-w-0 flex-col items-stretch overflow-x-visible">
               <SelfConfigureProductSelection
                 loanMonths={loanMonths}
                 onMonthsChange={setLoanMonths}
